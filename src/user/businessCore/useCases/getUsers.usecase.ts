@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from '../services/user.service';
 import { RabbitMQService } from '../services/rabbitmq.service';
 import { User } from '../interfaces/user.interface';
+import { JsonPlaceholderNetwork } from '../../../network/jsonplaceholder.network';
 
 @Injectable()
 export class GetUsersUseCase {
   constructor(
-    private readonly userService: UserService,
+    private readonly jsonPlaceHolderService: JsonPlaceholderNetwork,
     private readonly rabbitmqService: RabbitMQService,
   ) {}
 
   async execute(): Promise<User[]> {
-    const users = await this.userService.getUsers();
+    const users = await this.jsonPlaceHolderService.getUsers();
     const filteredUsers = users.map(({ address, ...rest }) => rest);
     const sortedUsers = filteredUsers.sort((a, b) => b.id - a.id);
     await this.rabbitmqService.publishUsers(
